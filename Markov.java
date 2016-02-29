@@ -54,9 +54,8 @@ public class Markov extends javax.swing.JFrame {
             }
         }
         
-        execBut.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        execBut.addActionListener((ActionEvent e)->{
+            {
                 try {
                     treeList = new ArrayList<>();
                     treeSet = new HashSet<>();
@@ -67,15 +66,12 @@ public class Markov extends javax.swing.JFrame {
             }    
         });
         
-        clearBut.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        clearBut.addActionListener((ActionEvent e)-> {
                 treeList = new ArrayList<>();
                 treeSet = new HashSet<>();
                 resultArea.setText("");
-            }
-            
         });
+            
     }
     
     private void print(String string, int tabIndex){
