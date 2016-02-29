@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -17,11 +18,14 @@ public class Markov extends javax.swing.JFrame {
     int tabIndex;
     String result;
     Vector<String> ruleSet;
+    ArrayList<String> treeList;
+    HashSet<String> treeSet;
+    double uniquePercent;
+    
     
     public Markov() throws IOException {
         initComponents();
-        initElements();
-        
+        initElements();    
     }
 
     private void initElements() throws IOException{
@@ -54,6 +58,8 @@ public class Markov extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    treeList = new ArrayList<>();
+                    treeSet = new HashSet<>();
                     activizeMarkov(comboWords.getSelectedItem().toString());
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(Markov.class.getName()).log(Level.SEVERE, null, ex);
@@ -64,6 +70,8 @@ public class Markov extends javax.swing.JFrame {
         clearBut.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
+                treeList = new ArrayList<>();
+                treeSet = new HashSet<>();
                 resultArea.setText("");
             }
             
@@ -71,6 +79,7 @@ public class Markov extends javax.swing.JFrame {
     }
     
     private void print(String string, int tabIndex){
+        resultArea.append("|");
         for (int i = 0; i < tabIndex; i++){
             System.out.print("     ");
             resultArea.append("     ");
@@ -90,17 +99,29 @@ public class Markov extends javax.swing.JFrame {
         resultArea.append("NEW WORD:\n" + str);
         resultArea.append("\n");
         formatString(str);
-        
+        uniquePercent = (treeSet.size() / (double)treeList.size())*100;
+        resultArea.append("∟-------->   Unique/All = " + String.format("%.2f", uniquePercent) +"%.\n");
     }
     
     private void replaceString(String format, int index) throws FileNotFoundException{
         String helper;
+        
         if (format.contains(ruleSet.get(index))){
             helper = format.replace(ruleSet.get(index),ruleSet.get(index+1));
             printWithRule(helper, ++tabIndex, index);
+            treeList.add(helper);
             formatString(helper);
             tabIndex--;
         }
+        
+        if (tabIndex == 0){
+            for (String temp: treeList){
+                treeSet.add(temp);
+            }
+            System.out.println("List.length= " + treeList.size());
+            System.out.println("Set.length= " + treeSet.size());
+        }
+        
     }
     
     private void formatString(String format) throws FileNotFoundException{
@@ -116,6 +137,7 @@ public class Markov extends javax.swing.JFrame {
         
         index = 6;
         replaceString(format, index);
+        
     }
     
     private Vector<String> readRuleFile(String path) throws FileNotFoundException{
